@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.study.domain.post.LoginMapper">
+	
+	
+	<sql id="membercolums">
+		  user_id, client_code, name, mail, pwd, jumin_no, addr, zip, tel, hp, user_level, udate, bigo
+
+	</sql>
+
+
+	<select id="memberlogin" parameterType="string" resultType="com.study.domain.post.loginDTO">
+		SELECT
+			user_id
+			, pwd 
+		FROM
+			tb_member
+		WHERE 
+			user_id = #{userId}
+		AND
+			pwd = #{pwd}	
+	</select>
+	
+	
+	<select id="memberloginid" parameterType="string" resultType="com.study.domain.post.loginDTO">
+		SELECT
+			user_id
+		FROM
+			tb_member
+		WHERE 
+			user_id = #{userId}	
+	</select>
+	
+	
+	
+	<select id="memberloginpwd" parameterType="string" resultType="com.study.domain.post.loginDTO">
+		SELECT
+			pwd 
+		FROM
+			tb_member
+		WHERE 
+			pwd = #{pwd}	
+	</select>
+
+
+
+
+
+
+</mapper>

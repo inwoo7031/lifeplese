@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.domain.post.MasterPostMapper">
+
+
+    <!-- master_post 테이블 전체 컬럼 -->
+    <sql id="masterpostColumns">
+          master_id
+        , master_title
+        , master_content
+        , master_writer
+        , master_created_date
+        , total_id    
+     
+    </sql>
+    
+    
+    
+    
+    
+    
+    <sql id="masterattachColumns">
+    		master_idx
+        , master_board_idx
+        , master_original_name
+        , master_save_name
+        , master_size
+        , master_delete_yn
+        , master_insert_time
+        , master_delete_time
+        , master_total_file
+    </sql>      
+    
+    
+        <!-- tb_post 테이블 전체 컬럼 -->
+    <sql id="postColumns">
+          id
+        , title
+        , content
+        , writer
+        , view_cnt
+        , notice_yn
+        , delete_yn
+        , created_date
+        , modified_date
+    </sql>
+    
+    <!-- tb_attach 테이블 전체 컬럼  -->
+    <sql id="attachColumns">
+    		idx
+        , board_idx
+        , original_name
+        , save_name
+        , size
+        , delete_yn
+        , insert_time
+        , delete_time
+    </sql>    
+
+
+
+
+
+    <!-- 게시글 저장 -->
+    <insert id="mastersave" parameterType="com.study.domain.post.MasterPostDTO" useGeneratedKeys="true" keyProperty="masterId" >
+        INSERT INTO master_post (
+            <include refid="masterpostColumns" />
+        ) VALUES (
+              #{masterId}
+            , #{masterTitle}
+            , #{masterContent}
+            , #{masterWriter}
+            , now()
+            , #{id}
+                 
+           
+        )
+    </insert>
+    
+    
+     <!-- 게시글 상세정보 조회 
+    <select id="masterfindById" parameterType="long" resultType="com.study.domain.post.MasterPostDTO">
+        SELECT
+            <include refid="masterpostColumns" />
+            
+        FROM
+            master_post
+        WHERE
+            master_id = #{masterId}
+    </select>
+    -->
+    
+    
+    <select id="masterfindById" parameterType="long" resultType="com.study.domain.post.MasterPostDTO">
+        SELECT
+        	total_id
+        	, id
+        	, master_title
+        	, master_content
+        	, master_writer
+        	, master_created_date
+        	     
+        FROM
+            master_post, tb_post
+        WHERE
+        	#{id} = total_id
+        AND
+        	total_id = id		 	    
+          
+    </select>
+    
+    
+    
+    <!-- 12.09 안되면 이거 지워 -->
+    <select id="dsdsdparatwomasterfindById" parameterType="long" resultType="com.study.domain.post.MasterPostDTO">
+        SELECT
+        	total_id
+        	, master_id
+        	, id
+        	, master_title
+        	, master_content
+        	, master_writer
+        	, master_created_date
+        	     
+        FROM
+            master_post, tb_post
+        WHERE
+        	#{id} = total_id
+        AND
+        	total_id = id		 	    
+          
+    </select>
+    
+    
+    
+    
+    <select id="paratwomasterfindById" parameterType="long" resultType="com.study.domain.post.TestMasterPostDTO">
+        SELECT
+        	total_id
+        	, master_id
+        	, id
+        	     
+        FROM
+            master_post, tb_post
+        WHERE
+        	#{id} = id
+        AND
+        	total_id = id		 	    
+          
+    </select>
+    
+    
+    
+    
+    
+    
+    
+	
+
+	
+	
+	
+    
+    
+    
+    <!--  
+    <select id = "MasterFindspecificfiles" parameterType="com.study.domain.post.MasterPostDTO"  resultType="com.study.domain.post.MasterFileDTO">
+    	select
+    		master_id
+    		, master_board_idx
+    		, master_original_name
+    		, master_insert_time
+    		, master_save_name 
+    	
+    	from 
+    		master_post, master_attach
+    	where 	
+    		#{masterId} = master_board_idx 
+    	and
+    		master_id = master_board_idx
+    
+     </select>
+     -->
+     
+     <!-- 관리자 파일에 대한 부분
+     <select id = "MasterFindspecificfiles" parameterType="com.study.domain.post.MasterPostDTO"  resultType="com.study.domain.post.MasterFileDTO">
+    	select
+    		id
+    		, master_id
+    		, master_board_idx
+    		
+    		, master_original_name
+    		, master_insert_time
+    		, master_save_name 
+    		
+    		
+    		
+    		
+    	
+    	from 
+    		tb_post, master_attach, master_post
+    	where 	
+    		master_board_idx = #{id}
+    	AND
+    		master_id = master_board_idx
+     </select>
+     -->
+     
+     
+     
+     <!-- 관리자 파일에 대한 부분  이거 안되면 위에꺼 살리고 이거는 죽이세-->
+     <select id = "MasterFindspecificfiles" parameterType="com.study.domain.post.MasterPostDTO"  resultType="com.study.domain.post.MasterFileDTO">
+    	select
+    		id
+    		, board_idx
+    		, total_id
+    		, master_id
+    		, master_board_idx	
+    		, master_original_name
+    		, master_insert_time
+    		, master_save_name 
+
+    	from 
+    		tb_post, tb_attach ,master_attach, master_post
+    	where 	
+    		id = #{id}
+    	AND
+    		board_idx = #{id}
+    	AND
+    		total_id = #{id}
+    	AND
+    		master_id = master_board_idx	
+    	
+    				
+    		
+    	
+     </select>
+     
+     
+
+	
+
+
+
+</mapper>

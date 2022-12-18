@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.domain.post.MasterAttachMapper">
+
+
+    <sql id="masterattachColumns">
+    	
+    		
+    		master_idx                      
+        , master_board_idx 
+        , master_original_name
+        , master_save_name
+        , master_size
+        , master_delete_yn
+        , master_insert_time
+        , master_delete_time
+       
+
+    </sql>
+    
+    
+    <!-- master_post 테이블 전체 컬럼 -->
+    <sql id="masterpostColumns">
+          master_id
+        , master_title
+        , master_content
+        , master_writer
+        , master_created_date
+  
+       
+    </sql>
+    
+    
+    
+	<!-- 파일 저장 
+	<insert id="masterInsertAttach" parameterType="list">
+		INSERT INTO master_attach (
+			<include refid="masterattachColumns" />
+		) VALUES
+		<foreach collection="list" item="item" separator=",">
+		(
+			  #{item.masterIdx}
+			, #{item.masterBoardIdx}
+			, #{item.masterOriginalName}
+			, #{item.masterSaveName}
+			, #{item.masterSize}
+			, '0'
+			, now()
+			, NULL
+			, #{id}
+		)
+		</foreach>
+	</insert>
+	-->
+	
+	
+    <sql id="postColumns">
+          id
+        , title
+        , content
+        , writer
+        , view_cnt
+        , notice_yn
+        , delete_yn
+        , created_date
+        , modified_date
+    </sql>	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<insert id="masterInsertAttach" parameterType="list">
+		INSERT INTO master_attach (
+			<include refid="masterattachColumns" />
+		) VALUES
+		<foreach collection="list" item="item" separator=",">
+		(		
+			  #{item.masterIdx}	
+			, #{item.masterBoardIdx}
+			, #{item.masterOriginalName}
+			, #{item.masterSaveName}
+			, #{item.masterSize}
+			, '0'
+			, now()
+			, NULL
+			
+
+		)
+		</foreach>
+	</insert>
+	
+	
+
+
+	<!-- 파일 삭제 (진짜 삭제하지는 않고) -->
+	<update id="masterDeleteAttach" parameterType="long">
+		UPDATE master_attach
+		SET
+			  master_delete_yn = 1
+			, master_delete_time = now()
+		WHERE
+			master_idx = #{masterIdx}
+	</update>
+	
+	
+	<!--  postmapper 에서 다른거 쓰면 이거는 피룡없ㄱ는거 아니요? -->
+	<select id="masterSelectAttachDetail" parameterType="long" resultType="com.study.domain.post.MasterAttachDTO">
+		SELECT
+			<include refid="masterattachColumns" />
+		FROM
+			master_attach
+		WHERE
+			master_delete_yn = '0'
+		AND
+			master_idx = #{masteridx}I
+	</select>
+
+	<!-- 특정 게시글에 포함된 파일 목록을 조회하는?? select -->
+	<select id="masterSelectAttachList" parameterType="long" resultType="com.study.domain.post.MasterAttachDTO">
+		SELECT
+			<include refid="masterattachColumns" />
+		FROM
+			master_attach
+		WHERE
+			master_delete_yn = '0'
+		AND
+			master_board_idx = #{masterBoardIdx}
+	</select>
+	
+	<!-- 특정 글에 포함됨 파일의 개수  -->
+	<select id="masterSelectAttachTotalCount" parameterType="long" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			master_attach
+		WHERE
+			master_delete_yn = '0'	
+	
+	</select>    
+
+
+
+
+
+
+</mapper>

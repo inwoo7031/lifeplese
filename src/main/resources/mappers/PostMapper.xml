@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.study.domain.post.PostMapper">
+
+    <!-- tb_post 테이블 전체 컬럼 -->
+    <sql id="postColumns">
+          id
+        , title
+        , content
+        , writer
+        , view_cnt
+        , notice_yn
+        , delete_yn
+        , created_date
+        , modified_date
+        , answer_gubun
+    </sql>
+    
+    <sql id="attachColumns">
+    		idx
+        , board_idx
+        , original_name
+        , save_name
+        , size
+        , delete_yn
+        , insert_time
+        , delete_time
+    </sql>
+    
+    
+    
+    
+        
+    
+
+
+    
+    
+    <!-- 게시글 검색 -->
+    <sql id="search">
+        <!-- 검색 키워드가 있을 때 -->
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <!-- 검색 유형이 있을 때 -->
+                <when test="searchType != null and searchType != ''">
+                    <choose>
+                        <when test="'title'.equals( searchType )">
+                            AND title LIKE CONCAT('%', #{keyword}, '%')
+                        </when>
+                        <when test="'content'.equals( searchType )">
+                            AND content LIKE CONCAT('%', #{keyword}, '%')
+                        </when>
+                        <when test="'writer'.equals( searchType )">
+                            AND writer LIKE CONCAT('%', #{keyword}, '%')
+                        </when>
+                    </choose>
+                </when>
+                <!-- 전체 검색일 때 때 -->
+                <otherwise>
+                    AND (
+                           title LIKE CONCAT('%', #{keyword}, '%')
+                        OR content LIKE CONCAT('%', #{keyword}, '%')
+                        OR writer LIKE CONCAT('%', #{keyword}, '%')
+                    )
+                </otherwise>
+            </choose>
+        </if>
+    </sql>
+    
+
+    
+    
+    
+    
+ 
+
+    <!-- 게시글 저장 -->
+    <insert id="save" parameterType="com.study.domain.post.PostDTO" useGeneratedKeys="true" keyProperty="id" >
+        INSERT INTO tb_post (
+            <include refid="postColumns" />
+        ) VALUES (
+              #{id}
+            , #{title}
+            , #{content}
+            , #{writer}
+            , 0
+            , #{noticeYn}
+            , 0
+            , now()
+            , NULL 
+            , 0        
+        )
+    </insert>
+    
+    
+    
+    
+    <!-- 이게 특정 게시글에 있는 파일의 이름을 뽑아오는 쿼리문 
+    <select id = "Findspecificasfiles" parameterType="long"  resultType="com.study.domain.post.FileDTO">
+    	select
+    		id
+    		, board_idx
+    		, original_name
+    		, save_name
+    	from 
+    		tb_post
+    	inner join
+    		tb_attach 
+    	where
+    		tb_attach.idx = #{value};
+    
+    
+    
+    </select>
+    
+    -->
+    
+    
+    <!--  -->
+    <select id = "Findspecificfiles" parameterType="com.study.domain.post.PostDTO"  resultType="com.study.domain.post.FileDTO">
+    	select
+    		id
+    		, board_idx
+    		, original_name
+    		, insert_time
+    		, save_name 
+    	
+    	from 
+    		tb_post, tb_attach
+    	where 	
+    		#{id} = board_idx 
+    	and
+    		id = board_idx
+    
+     </select>
+    
+    
+    
+    
+    
+    
+    
+
+
+    <!-- 게시글 상세정보 조회 -->
+    <select id="findById" parameterType="long" resultType="com.study.domain.post.PostDTO">
+        SELECT
+            <include refid="postColumns" />
+        FROM
+            tb_post
+        WHERE
+            id = #{id}
+    </select>
+    
+    
+    
+    <!-- 게시글 상세정보 조회 -->
+    <select id="findByGubun" parameterType="long" resultType="com.study.domain.post.GubunDTO">
+        SELECT
+            <include refid="postColumns" />
+        FROM
+            tb_post
+        WHERE
+            id = #{id}
+        AND
+        	answer_gubun = 1    
+    </select>
+    
+    
+ 
+
+    
+    
+    <update id="updategubun" parameterType ="com.study.domain.post.PostDTO" >
+    UPDATE tb_post
+    SET
+    	answer_gubun = 1
+    WHERE
+    	id = #{id}	
+    
+    </update>
+
+    
+    
+    
+    
+    <update id="update" parameterType="com.study.domain.post.PostDTO" >
+        UPDATE tb_post
+        SET
+              modified_date = now()
+            , title = #{title}
+            , content = #{content}
+            , writer = #{writer}
+            , notice_yn = #{noticeYn}
+        WHERE
+            id = #{id}
+    </update>
+    
+    
+    <!-- 12/14 로그인 기능(입력한 값 쿼리에 넣어서 맞는지 아닌지 비교) 
+    <select id = "comparelogin" parameterType="com.study.domain.post.loginDTO">
+    	SELECT
+    		userid
+    		,pwd
+    	FROM
+    		tb_member
+    	WHERE
+    		userid = #{userId}	 	
+    	AND	
+    		pwd = #{pwd}
+    
+    
+    
+    </select>
+    -->
+
+
+    <!-- 게시글 삭제 -->
+    <delete id="deleteById" parameterType="long"  >
+        UPDATE tb_post
+        SET
+            delete_yn = 1
+        WHERE
+            id = #{id}
+    </delete>
+
+
+    <!-- 게시글 리스트 조회 -->
+    <select id="findAll" parameterType="com.study.common.dto.SearchDto" resultType="com.study.domain.post.PostDTO" >
+        SELECT
+            <include refid="postColumns" />
+        FROM
+            tb_post
+        WHERE
+            delete_yn = 0
+            <include refid="search" />
+        ORDER BY
+            id DESC
+        LIMIT #{pagination.limitStart}, #{recordSize}
+    </select>
+
+
+    <!-- 게시글 수 카운팅 -->
+    <select id="count" parameterType="com.study.common.dto.SearchDto" resultType="int" >
+        SELECT
+            COUNT(*)
+        FROM
+            tb_post
+        WHERE
+            delete_yn = 0
+            <include refid="search" />
+    </select>
+    
+    
+
+    
+    
+    
+    
+    
+
+</mapper>

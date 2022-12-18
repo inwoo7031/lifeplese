@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/basic">
+    <th:block layout:fragment="title">
+        <title>게시판 로그인 페이지</title>
+    </th:block>
+
+    <th:block layout:fragment="content">
+        <div class="card-content">
+      
+            <form id="saveForm" class="form-horizontal" method="post" autocomplete="off" action="/post/llogin.do" >
+                
+                <div class="form-group">
+                    <label for="title" class="col-sm-2 control-label">아이디</label>
+                    <div class="col-sm-10" >
+                        <input type="text"  id="userId" name="userId" class="form-control" maxlength="50" placeholder="아이디를 입력하세요" />
+                    </div>
+                </div>
+ 				
+                
+                
+                
+                <div class="form-group">
+                    <label for="writer" class="col-sm-2 control-label">비밀번호</label>
+                    <div class="col-sm-10">
+                        <input type="password" id="pwd" name="pwd" class="form-control" maxlength="10" placeholder="비밀번호를 입력하세요" />
+                    </div>
+                </div>
+                
+				  
+				<div id="btnDiv" class="form-group" th:object="${userloginparams}">
+                <!--  	<button type="button" class="btn btn-primary waves-effect waves-light" onclick="LoginPost();">로그인</button> -->
+                	<input type="submit" class="btn btn-primary waves-effect waves-light" value="로그인" >
+            	</div>
+				
+				
+            </form>    
+        </div>
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:inline="javascript">
+        /*<![CDATA[*/
+        	
+        	 $('.summernote').summernote({
+	 			 height: 150,
+	 			 lang: "ko-KR"
+				});
+        	
+      
+	
+        	window.onload = () => {
+                renderPostInfo();
+            }
+
+
+            // 게시글 상세정보 렌더링
+            function renderPostInfo() {
+                const post = [[ ${post} ]];
+                if ( !post ) {
+                    return false;
+                }
+
+                const form = document.getElementById('saveForm');
+                //const fields = ['id', 'title', 'content', 'writer', 'noticeYn'];  원래 여기에 'noticeYn'도 원래 있었는데 뺏음
+                const fields = ['id', 'title', 'content', 'writer'];
+                
+
+                fields.forEach(field => {
+                    form[field].value = post[field];
+                })
+            }
+
+            // 게시글 저장(수정)
+            function savePost() {
+                const form = document.getElementById('saveForm');
+                const fields = [form.title, form.writer, form.content];
+                const fieldNames = ['제목', '이름', '내용'];
+
+                for (let i = 0, len = fields.length; i < len; i++) {
+                    if ( !isValid(fields[i], fieldNames[i]) ) {
+                        return false;
+                    }
+                }
+
+             //   form.noticeYn.value = form.isNotice.checked;
+                form.action = [[ ${post == null} ]] ? '/post/save.do' : '/post/update.do';     
+                form.submit();
+            }
+            
+  
+         // 게시글 수정 페이지로 이동
+            function LoginPost() {
+                location.href = '/post/llogin.do' + location.search;
+            }
+            
+            
+            
+            
+
+        /*]]>*/
+        </script>
+    </th:block>
+</html>
